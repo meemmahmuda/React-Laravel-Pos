@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Lin } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
