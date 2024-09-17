@@ -72,6 +72,9 @@ function Dashboard() {
               <div className="icon" style={iconStyle('#28a745')}>
                 <i className="fa fa-box"></i>
               </div>
+              <Link to="/products" className="small-box-footer" style={footerStyle}>
+                View <i className="fa fa-arrow-circle-right"></i>
+              </Link>
             </div>
           </div>
 
@@ -85,6 +88,9 @@ function Dashboard() {
               <div className="icon" style={iconStyle('#dc3545')}>
                 <i className="fa fa-shopping-cart"></i>
               </div>
+              <Link to="/orders" className="small-box-footer" style={footerStyle}>
+                View <i className="fa fa-arrow-circle-right"></i>
+              </Link>
             </div>
           </div>
 
@@ -98,6 +104,9 @@ function Dashboard() {
               <div className="icon" style={iconStyle('#17a2b8')}>
                 <i className="fa fa-money-bill-wave"></i>
               </div>
+              <Link to="/purchases" className="small-box-footer" style={footerStyle}>
+                View <i className="fa fa-arrow-circle-right"></i>
+              </Link>
             </div>
           </div>
 

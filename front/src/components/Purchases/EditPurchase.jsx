@@ -98,6 +98,7 @@ const EditPurchase = () => {
 
     return (
         <div className="container">
+            <h2>Edit Purchase</h2>
             <form onSubmit={handleSubmit} style={{ marginBottom: '60px' }}>
                 <div className="form-group">
                     <label htmlFor="order_id">Order</label>

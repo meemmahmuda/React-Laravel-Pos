@@ -65,6 +65,7 @@ const EditProduct = () => {
 
     return (
         <div className="container">
+            <h2>Edit Product</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="name">Product Name</label>

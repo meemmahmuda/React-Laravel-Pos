@@ -31,8 +31,9 @@ const PurchasesList = () => {
 
     return (
         <div className="container">
-            <Link to="/purchases/create" className="btn btn-primary">Add New Purchase</Link>
-            <table className="table table-bordered mt-3">
+            <h2 style={{ textAlign: 'center' }}>Purchase List</h2>
+            <Link to="/purchases/create" className="btn btn-primary mb-3">Add New Purchase</Link>
+            <table className="table table-striped table-hover">
                 <thead>
                     <tr style={{ textAlign: 'center' }}>
                         <th>SL No.</th>

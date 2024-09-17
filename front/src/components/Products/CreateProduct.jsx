@@ -52,6 +52,7 @@ const CreateProduct = () => {
 
     return (
         <div className="container">
+            <h2>Add New Product</h2>
             <form onSubmit={handleSubmit} style={{ paddingBottom: '60px' }}>
                 {products.map((product, index) => (
                     <div key={index} className="product-form-group">

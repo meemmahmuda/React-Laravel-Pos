@@ -34,8 +34,9 @@ const OrderList = () => {
 
     return (
         <div className="container">
-            <Link to="/orders/create" className="btn btn-primary">Add New Order</Link>
-            <table className="table table-bordered mt-3">
+            <h2 style={{ textAlign: 'center' }}>Order List</h2>
+            <Link to="/orders/create" className="btn btn-primary mb-3">Add New Order</Link>
+            <table className="table table-striped table-hover">
                 <thead>
                     <tr style={{ textAlign: 'center' }}>
                         <th>SL No.</th>

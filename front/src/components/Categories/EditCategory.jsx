@@ -40,6 +40,7 @@ const EditCategory = () => {
 
   return (
     <div className="container">
+      <h2>Edit Category</h2>
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <form onSubmit={handleSubmit}>

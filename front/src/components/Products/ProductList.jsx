@@ -33,12 +33,13 @@ const ProductList = () => {
 
     return (
         <div className="container">
+            <h2 style={{ textAlign: 'center' }}>Product List</h2>
             <Link to="/products/create" className="btn btn-primary mb-3">Add New Product</Link>
 
             {successMessage && <div className="alert alert-success">{successMessage}</div>}
             {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
-            <table className="table table-bordered mt-3">
+            <table className="table table-striped table-hover">
                 <thead>
                     <tr style={{ textAlign: 'center' }}>
                         <th>SL No.</th>
