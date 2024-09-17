@@ -14,6 +14,15 @@ import EditSupplier from './components/Suppliers/EditSupplier';
 import ExpenseList from './components/Expenses/ExpenseList';
 import CreateExpense from './components/Expenses/CreateExpense';
 import EditExpense from './components/Expenses/EditExpense';
+import ProductList from './components/Products/ProductList';
+import CreateProduct from './components/Products/CreateProduct';
+import EditProduct from './components/Products/EditProduct';
+import OrderList from './components/Orders/OrderList';
+import CreateOrder from './components/Orders/CreateOrder';
+import EditOrder from './components/Orders/EditOrder';
+import PurchasesList from './components/Purchases/PurchaseList';
+import CreatePurchase from './components/Purchases/CreatePurchase';
+import EditPurchase from './components/Purchases/EditPurchase';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -59,16 +68,32 @@ const App = () => {
 
         
         <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+
         <Route path="/categories" element={<Layout><CategoryList /></Layout>} />
         <Route path="/categories/create" element={<Layout><CreateCategory /></Layout>} />
         <Route path="/categories/edit/:id" element={<Layout><EditCategory /></Layout>} />
+
         <Route path="/suppliers" element={<Layout><SupplierList /></Layout>} />
         <Route path="/suppliers/create" element={<Layout><CreateSupplier /></Layout>} />
         <Route path="/suppliers/edit/:id" element={<Layout><EditSupplier /></Layout>} />
+
         <Route path="/expenses" element={<Layout><ExpenseList /></Layout>} />
         <Route path="/expenses/create" element={<Layout><CreateExpense /></Layout>} />
         <Route path="/expenses/edit/:id" element={<Layout><EditExpense /></Layout>} />
-       
+
+        <Route path="/products" element={<Layout><ProductList /></Layout>} />
+        <Route path="/products/create" element={<Layout><CreateProduct /></Layout>} />
+        <Route path="/products/edit/:id" element={<Layout><EditProduct /></Layout>} />
+
+        <Route path="/orders" element={<Layout><OrderList /></Layout>} />
+        <Route path="/orders/create" element={<Layout><CreateOrder /></Layout>} />
+        <Route path="/orders/edit/:id" element={<Layout><EditOrder /></Layout>} />
+        
+        <Route path="/purchases" element={<Layout><PurchasesList /></Layout>} />
+        <Route path="/purchases/create" element={<Layout><CreatePurchase /></Layout>} />
+        <Route path="/purchases/edit/:id" element={<Layout><EditPurchase /></Layout>} />
+
+
       </Routes>
     </Router>
   );

@@ -12,7 +12,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('supplier', 'category')->orderBy('created_at', 'desc')->get();
-        return view('products.index', compact('products'));
+        return response()->json($products);
     }
 
     public function create()
@@ -40,7 +40,7 @@ class ProductController extends Controller
             Product::create($validatedData);
         }
 
-        return redirect()->route('products.index')->with('success', 'Products created successfully.');
+        return response()->json(['success' => 'Products created successfully.']);
     }
 
     public function edit(Product $product)
@@ -64,12 +64,17 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
+        return response()->json(['success' => 'Product updated successfully.']);
+    }
+
+    public function show(Product $product)
+    {
+        return response()->json($product);
     }
 
     public function destroy(Product $product)
     {
         $product->delete();
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        return response()->json(['success' => 'Product deleted successfully.']);
     }
 }

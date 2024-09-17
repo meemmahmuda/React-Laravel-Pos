@@ -13,7 +13,7 @@ class PurchaseController extends Controller
     public function index()
 {
     $purchases = Purchase::with(['order.product', 'order.supplier'])->orderBy('created_at', 'desc')->get();
-    return view('purchases.index', compact('purchases'));
+    return response()->json($purchases);
 }
 
 public function printInvoice(Purchase $purchase)
@@ -25,7 +25,7 @@ public function printInvoice(Purchase $purchase)
     public function create()
     {
         $orders = Order::all();
-        return view('purchases.create', compact('orders'));
+        return response()->json($orders);
     }
 
     public function store(Request $request)
@@ -54,43 +54,53 @@ public function printInvoice(Purchase $purchase)
             'change_returned' => $changeReturned,
         ]);
 
-        return redirect()->route('purchases.index')->with('success', 'Purchase created successfully.');
+        return response()->json(['message' => 'Purchase created successfully.']);
     }
 
-    public function edit(Purchase $purchase)
-    {
-        $orders = Order::all();
-        return view('purchases.edit', compact('purchase', 'orders'));
-    }
+    public function edit($id)
+{
+    $purchase = Purchase::with(['order.product', 'order.supplier'])->findOrFail($id);
+    $orders = Order::with(['product', 'supplier'])->get();
 
-    public function update(Request $request, Purchase $purchase)
-    {
-        $request->validate([
-            'order_id' => 'required',
-            'quantity' => 'required|integer',
-            'amount_given' => 'required|integer',
-        ]);
+    return response()->json([
+        'purchase' => $purchase,
+        'orders' => $orders,
+    ]);
+}
 
-        $order = Order::findOrFail($request->order_id);
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'order_id' => 'required',
+        'quantity' => 'required|integer',
+        'amount_given' => 'required|integer',
+    ]);
 
-        $totalPrice = $order->purchase_price * $request->quantity;
-        $changeReturned = $request->amount_given - $totalPrice;
+    $purchase = Purchase::findOrFail($id);
+    $order = Order::findOrFail($request->order_id);
 
-        // Update product stock
-        // $product = Product::findOrFail($order->product_id);
-        // $product->stock += $request->quantity;
-        // $product->save();
+    $totalPrice = $order->purchase_price * $request->quantity;
+    $changeReturned = $request->amount_given - $totalPrice;
 
-        $purchase->update([
-            'order_id' => $order->id,
-            'quantity' => $request->quantity,
-            'total_price' => $totalPrice,
-            'amount_given' => $request->amount_given,
-            'change_returned' => $changeReturned,
-        ]);
+    $purchase->update([
+        'order_id' => $order->id,
+        'quantity' => $request->quantity,
+        'total_price' => $totalPrice,
+        'amount_given' => $request->amount_given,
+        'change_returned' => $changeReturned,
+    ]);
 
-        return redirect()->route('purchases.index')->with('success', 'Purchase updated successfully.');
-    }
+    return response()->json(['success' => 'Purchase updated successfully.']);
+}
+
+
+public function show(Purchase $purchase)
+{
+    // Eager load the related order, product, and supplier
+    $purchase->load('order.product', 'order.supplier');
+    return response()->json($purchase);
+}
+
 
     public function destroy(Purchase $purchase)
     {
@@ -99,7 +109,7 @@ public function printInvoice(Purchase $purchase)
         $product->save();
 
         $purchase->delete();
-        return redirect()->route('purchases.index')->with('success', 'Purchase deleted successfully.');
+        return response()->json(['message' => 'Purchase deleted successfully.']);
     }
 
 

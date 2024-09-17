@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Order;
@@ -11,13 +10,13 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::with('product', 'supplier')->orderBy('created_at', 'desc')->get();
-        return view('orders.index', compact('orders'));
+        return response()->json($orders);
     }
 
     public function create()
     {
         $products = Product::with('supplier')->get();
-        return view('orders.create', compact('products'));
+        return response()->json($products);
     }
 
     public function store(Request $request)
@@ -39,13 +38,16 @@ class OrderController extends Controller
             'total_price' => $totalPrice,
         ]);
 
-        return redirect()->route('orders.index')->with('success', 'Order created successfully.');
+        return response()->json(['message' => 'Order created successfully.']);
     }
 
     public function edit(Order $order)
     {
         $products = Product::with('supplier')->get();
-        return view('orders.edit', compact('order', 'products'));
+        return response()->json([
+            'order' => $order,
+            'products' => $products
+        ]);
     }
 
     public function update(Request $request, Order $order)
@@ -67,12 +69,18 @@ class OrderController extends Controller
             'total_price' => $totalPrice,
         ]);
 
-        return redirect()->route('orders.index')->with('success', 'Order updated successfully.');
+        return response()->json(['message' => 'Order updated successfully.']);
+    }
+
+    public function show(Order $order)
+    {
+        $order->load('product', 'supplier');
+        return response()->json($order);
     }
 
     public function destroy(Order $order)
     {
         $order->delete();
-        return redirect()->route('orders.index')->with('success', 'Order deleted successfully.');
+        return response()->json(['message' => 'Order deleted successfully.']);
     }
 }

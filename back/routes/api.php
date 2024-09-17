@@ -7,6 +7,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PurchaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,3 +44,20 @@ Route::get('/expenses/{expense}', [ExpenseController::class, 'show']);
 Route::put('/expenses/{expense}', [ExpenseController::class, 'update']);
 Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy']);
 
+Route::get('/products', [ProductController::class, 'index']);
+Route::post('/products', [ProductController::class, 'store']);
+Route::get('/products/{product}', [ProductController::class, 'show']); 
+Route::put('/products/{product}', [ProductController::class, 'update']);
+Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
+Route::post('/orders', [OrderController::class, 'store']);
+Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/{order}', [OrderController::class, 'show']); 
+Route::put('/orders/{order}', [OrderController::class, 'update']);
+Route::delete('/orders/{order}', [OrderController::class, 'destroy']);
+
+Route::get('/purchases', [PurchaseController::class, 'index']);
+Route::post('/purchases', [PurchaseController::class, 'store']);
+Route::get('/purchases/{purchase}', [PurchaseController::class, 'show']); 
+Route::put('/purchases/{purchase}', [PurchaseController::class, 'update']);
+Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy']);
