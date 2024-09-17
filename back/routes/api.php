@@ -61,3 +61,5 @@ Route::post('/purchases', [PurchaseController::class, 'store']);
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show']); 
 Route::put('/purchases/{purchase}', [PurchaseController::class, 'update']);
 Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy']);
+// In your routes/api.php
+Route::get('purchases/invoice/{purchase}', [PurchaseController::class, 'printInvoice']);

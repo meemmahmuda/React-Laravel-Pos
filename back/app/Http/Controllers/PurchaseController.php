@@ -9,18 +9,23 @@ use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
-  
     public function index()
-{
-    $purchases = Purchase::with(['order.product', 'order.supplier'])->orderBy('created_at', 'desc')->get();
-    return response()->json($purchases);
-}
+    {
+        $purchases = Purchase::with(['order.product', 'order.supplier'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return response()->json($purchases);
+    }
 
-public function printInvoice(Purchase $purchase)
-{
-    return view('purchases.invoice', compact('purchase'));
-}
-
+    public function printInvoice(Purchase $purchase)
+    {
+        // Ensure the purchase has all necessary relationships loaded
+        $purchase->load(['order.product', 'order.supplier']);
+    
+        // Return a view with the purchase data
+        return view('purchases.invoice', ['purchase' => $purchase]);
+    }
+    
 
     public function create()
     {
@@ -31,7 +36,7 @@ public function printInvoice(Purchase $purchase)
     public function store(Request $request)
     {
         $request->validate([
-            'order_id' => 'required',
+            'order_id' => 'required|exists:orders,id',
             'quantity' => 'required|integer',
             'amount_given' => 'required|integer',
         ]);
@@ -46,7 +51,7 @@ public function printInvoice(Purchase $purchase)
         $product->stock += $request->quantity;
         $product->save();
 
-        Purchase::create([
+        $purchase = Purchase::create([
             'order_id' => $order->id,
             'quantity' => $request->quantity,
             'total_price' => $totalPrice,
@@ -54,53 +59,47 @@ public function printInvoice(Purchase $purchase)
             'change_returned' => $changeReturned,
         ]);
 
-        return response()->json(['message' => 'Purchase created successfully.']);
+        return response()->json([
+            'message' => 'Purchase created successfully.',
+            'purchase' => $purchase
+        ]);
     }
 
-    public function edit($id)
-{
-    $purchase = Purchase::with(['order.product', 'order.supplier'])->findOrFail($id);
-    $orders = Order::with(['product', 'supplier'])->get();
+    public function edit(Purchase $purchase)
+    {
+        $orders = Order::all();
+        return response()->json([
+            'purchase' => $purchase->load('order'),
+            'orders' => $orders
+        ]);
+    }
 
-    return response()->json([
-        'purchase' => $purchase,
-        'orders' => $orders,
-    ]);
-}
+    public function update(Request $request, Purchase $purchase)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'quantity' => 'required|integer',
+            'amount_given' => 'required|integer',
+        ]);
 
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'order_id' => 'required',
-        'quantity' => 'required|integer',
-        'amount_given' => 'required|integer',
-    ]);
+        $order = Order::findOrFail($request->order_id);
 
-    $purchase = Purchase::findOrFail($id);
-    $order = Order::findOrFail($request->order_id);
+        $totalPrice = $order->purchase_price * $request->quantity;
+        $changeReturned = $request->amount_given - $totalPrice;
 
-    $totalPrice = $order->purchase_price * $request->quantity;
-    $changeReturned = $request->amount_given - $totalPrice;
+        $purchase->update([
+            'order_id' => $order->id,
+            'quantity' => $request->quantity,
+            'total_price' => $totalPrice,
+            'amount_given' => $request->amount_given,
+            'change_returned' => $changeReturned,
+        ]);
 
-    $purchase->update([
-        'order_id' => $order->id,
-        'quantity' => $request->quantity,
-        'total_price' => $totalPrice,
-        'amount_given' => $request->amount_given,
-        'change_returned' => $changeReturned,
-    ]);
-
-    return response()->json(['success' => 'Purchase updated successfully.']);
-}
-
-
-public function show(Purchase $purchase)
-{
-    // Eager load the related order, product, and supplier
-    $purchase->load('order.product', 'order.supplier');
-    return response()->json($purchase);
-}
-
+        return response()->json([
+            'message' => 'Purchase updated successfully.',
+            'purchase' => $purchase
+        ]);
+    }
 
     public function destroy(Purchase $purchase)
     {
@@ -111,6 +110,14 @@ public function show(Purchase $purchase)
         $purchase->delete();
         return response()->json(['message' => 'Purchase deleted successfully.']);
     }
+
+    public function show(Purchase $purchase)
+    {
+        // Ensure the purchase has all necessary relationships loaded
+        $purchase = Purchase::with(['order.product', 'order.supplier'])->findOrFail($purchase->id);
+        return response()->json($purchase);
+    }
+
 
 
     public function report(Request $request)

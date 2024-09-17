@@ -21,6 +21,14 @@ const PurchasesList = () => {
         }
     };
 
+    const handlePrint = (id) => {
+        const printWindow = window.open(`http://127.0.0.1:8000/api/purchases/invoice/${id}`, '_blank');
+        if (printWindow) {
+            printWindow.focus(); // Ensure the print window is in focus
+            printWindow.print(); // Trigger print dialog
+        }
+    };
+
     return (
         <div className="container">
             <Link to="/purchases/create" className="btn btn-primary">Add New Purchase</Link>
@@ -53,7 +61,12 @@ const PurchasesList = () => {
                                 >
                                     Delete
                                 </button>
-                                <a href={`http://127.0.0.1:8000/api/purchases/invoice/${purchase.id}`} target="_blank" className="btn btn-info" style={{ marginLeft: '10px' }}>Print Invoice</a>
+                                <button
+                                    onClick={() => handlePrint(purchase.id)}
+                                    className="btn btn-info" style={{ marginLeft: '10px' }}
+                                >
+                                    Print Invoice
+                                </button>
                             </td>
                         </tr>
                     ))}

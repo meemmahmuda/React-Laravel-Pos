@@ -11,6 +11,9 @@
         .details table, .details th, .details td { border: 1px solid #ddd; }
         .details th, .details td { padding: 10px; text-align: left; }
         .total { text-align: right; font-weight: bold; }
+        @media print {
+            .no-print { display: none; }
+        }
     </style>
 </head>
 
@@ -32,8 +35,8 @@
             <p><strong>Change Returned:</strong> {{ $purchase->change_returned }}</p>
         </div>
 
-        <div class="footer" style="text-align: center; margin-top: 20px;">
-            <button onclick="window.print()" class="btn btn-primary">Print Invoice</button>
+        <div class="footer">
+            <button onclick="window.print()" class="btn btn-primary no-print">Print Invoice</button>
         </div>
     </div>
 </body>
