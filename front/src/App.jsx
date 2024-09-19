@@ -26,6 +26,11 @@ import EditPurchase from './components/Purchases/EditPurchase';
 import SalesList from './components/Sales/SalesList';
 import CreateSales from './components/Sales/CreateSales';
 import EditSales from './components/Sales/EditSales';
+import ReturnList from './components/Sales_Return/ReturnList';
+import CreateReturn from './components/Sales_Return/CreateReturn';
+import SalesReport from './components/Sales/SalesReport';
+import PurchaseReport from './components/Purchases/PurchaseReport';
+import IncomeStatement from './components/IncomeStatement/IncomeStatement';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -95,10 +100,17 @@ const App = () => {
         <Route path="/purchases" element={<Layout><PurchasesList /></Layout>} />
         <Route path="/purchases/create" element={<Layout><CreatePurchase /></Layout>} />
         <Route path="/purchases/edit/:id" element={<Layout><EditPurchase /></Layout>} />
+        <Route path="/purchases/report" element={<Layout><PurchaseReport /></Layout>} />
 
         <Route path="/sales" element={<Layout><SalesList /></Layout>} />
         <Route path="/sales/create" element={<Layout><CreateSales /></Layout>} />
         <Route path="/sales/edit/:id" element={<Layout><EditSales /></Layout>} />
+        <Route path="/sales/report" element={<Layout><SalesReport /></Layout>} />
+
+        <Route path="/sales_returns" element={<Layout><ReturnList /></Layout>} />
+        <Route path="/sales_returns/create" element={<Layout><CreateReturn /></Layout>} />
+
+        <Route path="/income-statement" element={<Layout><IncomeStatement /></Layout>} />
 
 
       </Routes>

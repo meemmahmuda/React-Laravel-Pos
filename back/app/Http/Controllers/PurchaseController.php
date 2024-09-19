@@ -171,13 +171,14 @@ class PurchaseController extends Controller
             ];
         }
         
-        // Pass data to the view
-        return view('purchases.report', [
+        // Return JSON response
+        return response()->json([
             'reportData' => $reportData,
             'selectedDate' => $date,
             'selectedMonth' => $month
         ]);
     }
+     
     
     
     

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\SalesReturn;
 use App\Models\Sale;
-use App\Models\Product;
 use Illuminate\Http\Request;
 
 class SalesReturnController extends Controller
@@ -12,13 +11,13 @@ class SalesReturnController extends Controller
     public function index()
     {
         $salesReturns = SalesReturn::with('sale.product')->orderBy('created_at', 'desc')->get();
-        return view('sales_returns.index', compact('salesReturns'));
+        return response()->json($salesReturns);
     }
 
     public function create()
     {
         $sales = Sale::with('product')->get();
-        return view('sales_returns.create', compact('sales'));
+        return response()->json($sales);
     }
 
     public function store(Request $request)
@@ -33,7 +32,7 @@ class SalesReturnController extends Controller
         $quantityReturned = $request->quantity;
 
         if ($quantityReturned > $sale->quantity) {
-            return redirect()->back()->withErrors(['quantity' => 'The quantity returned cannot exceed the quantity sold.']);
+            return response()->json(['error' => 'The quantity returned cannot exceed the quantity sold.'], 422);
         }
 
         // Calculate the total price for the returned items
@@ -42,7 +41,7 @@ class SalesReturnController extends Controller
         $returnedTotalPrice = $returnedSubtotal - $discountAmount;
 
         // Create the sales return record
-        SalesReturn::create([
+        $salesReturn = SalesReturn::create([
             'sale_id' => $sale->id,
             'quantity' => $quantityReturned,
             'total_price' => $returnedTotalPrice,
@@ -56,7 +55,7 @@ class SalesReturnController extends Controller
         $sale->quantity -= $quantityReturned;
         $sale->save();
 
-        return redirect()->route('sales_returns.index')->with('success', 'Sales return processed successfully!');
+        return response()->json(['success' => 'Sales return processed successfully!', 'salesReturn' => $salesReturn], 201);
     }
 
     public function destroy(SalesReturn $salesReturn)
@@ -74,6 +73,6 @@ class SalesReturnController extends Controller
         // Delete the sales return record
         $salesReturn->delete();
 
-        return redirect()->route('sales_returns.index')->with('success', 'Sales return deleted successfully.');
+        return response()->json(['success' => 'Sales return deleted successfully.']);
     }
 }

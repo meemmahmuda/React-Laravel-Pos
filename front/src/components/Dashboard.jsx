@@ -120,6 +120,9 @@ function Dashboard() {
               <div className="icon" style={iconStyle('#6c757d')}>
                 <i className="fa fa-cash-register"></i>
               </div>
+              <Link to="/sales" className="small-box-footer" style={footerStyle}>
+                View <i className="fa fa-arrow-circle-right"></i>
+              </Link>
             </div>
           </div>
 
@@ -133,6 +136,9 @@ function Dashboard() {
               <div className="icon" style={iconStyle('#ffc107')}>
                 <i className="fa fa-undo"></i>
               </div>
+              <Link to="/sales_returns" className="small-box-footer" style={footerStyle}>
+                View <i className="fa fa-arrow-circle-right"></i>
+              </Link>
             </div>
           </div>
         </div>

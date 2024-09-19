@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SalesReturnController;
+use App\Http\Controllers\IncomeStatementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +59,7 @@ Route::get('/orders/{order}', [OrderController::class, 'show']);
 Route::put('/orders/{order}', [OrderController::class, 'update']);
 Route::delete('/orders/{order}', [OrderController::class, 'destroy']);
 
+Route::get('/purchases/report', [PurchaseController::class, 'report']);
 Route::get('/purchases', [PurchaseController::class, 'index']);
 Route::post('/purchases', [PurchaseController::class, 'store']);
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show']); 
@@ -64,11 +67,19 @@ Route::put('/purchases/{purchase}', [PurchaseController::class, 'update']);
 Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy']);
 Route::get('purchases/invoice/{purchase}', [PurchaseController::class, 'printInvoice']);
 
+Route::get('/income_statement', [IncomeStatementController::class, 'index']);
+Route::get('/sales/report', [SaleController::class, 'report']);
 Route::get('/sales', [SaleController::class, 'index']);
 Route::post('/sales', [SaleController::class, 'store']);
 Route::get('/sales/{sale}', [SaleController::class, 'show']); 
 Route::put('/sales/{sale}', [SaleController::class, 'update']);
 Route::delete('/sales/{sale}', [SaleController::class, 'destroy']);
 Route::get('sales/invoice/{sale}', [SaleController::class, 'printInvoice']);
+
+
+Route::get('/sales_returns', [SalesReturnController::class, 'index']);
+Route::post('/sales_returns', [SalesReturnController::class, 'store']);
+Route::delete('/sales_returns/{salesReturn}', [SalesReturnController::class, 'destroy']);
+
 
 

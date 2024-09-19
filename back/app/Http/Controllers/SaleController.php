@@ -163,72 +163,71 @@ public function show(Sale $sale)
 
   
     
-public function report(Request $request)
-{
-    // Get the date and month from the request
-    $date = $request->input('date');
-    $month = $request->input('month');
-    
-    // Initialize the query
-    $query = Sale::with('product.category');
-    
-    // Filter by date if provided
-    if ($date) {
-        // Ensure the date is in Y-m-d format
-        $query->whereDate('created_at', $date);
-    }
-    // Filter by month if provided (ignore date)
-    elseif ($month) {
-        $year = now()->year;
-        $startDate = "$year-$month-01";
-        // Ensure the end date includes the last day of the month
-        $endDate = now()->year($year)->month($month)->endOfMonth()->format('Y-m-d');
-        $query->whereBetween('created_at', [$startDate, $endDate]);
-    } 
-    // If neither date nor month is provided, use today's date
-    else {
-        $date = now()->format('Y-m-d');
-        $query->whereDate('created_at', $date);
-    }
-    
-    // Fetch sales data and eager load relationships
-    $sales = $query->get();
-    
-    // Initialize array to store report data
-    $reportData = [];
-    
-    foreach ($sales as $sale) {
-        $category = $sale->product->category->name;
-        $productName = $sale->product->name;
-        $unitsSold = $sale->quantity;
-        $unitPrice = $sale->selling_price;
-        $discount = $sale->discount;
+    public function report(Request $request)
+    {
+        // Get the date and month from the request
+        $date = $request->input('date');
+        $month = $request->input('month');
         
-        // Calculate total sales and net sales
-        $subtotal = $unitPrice * $unitsSold;
-        $discountAmount = ($discount / 100) * $subtotal;
-        $totalSales = $subtotal;
-        $netSales = $subtotal - $discountAmount;
-    
-        // Add data to report array
-        $reportData[] = [
-            'category' => $category,
-            'product_name' => $productName,
-            'units_sold' => $unitsSold,
-            'unit_price' => number_format($unitPrice, 2),
-            'discount' => number_format($discountAmount, 2),
-            'total_sales' => number_format($totalSales, 2),
-            'net_sales' => number_format($netSales, 2),
-        ];
+        // Initialize the query
+        $query = Sale::with('product.category');
+        
+        // Filter by date if provided
+        if ($date) {
+            $query->whereDate('created_at', $date);
+        } 
+        // Filter by month if provided
+        elseif ($month) {
+            $year = now()->year;
+            $startDate = "$year-$month-01";
+            $endDate = now()->year($year)->month($month)->endOfMonth()->format('Y-m-d');
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        } 
+        // If neither date nor month is provided, use today's date
+        else {
+            $date = now()->format('Y-m-d');
+            $query->whereDate('created_at', $date);
+        }
+        
+        // Fetch sales data and eager load relationships
+        $sales = $query->get();
+        
+        // Initialize array to store report data
+        $reportData = [];
+        
+        foreach ($sales as $sale) {
+            $category = $sale->product->category->name;
+            $productName = $sale->product->name;
+            $unitsSold = $sale->quantity;
+            $unitPrice = $sale->selling_price;
+            $discount = $sale->discount;
+            
+            // Calculate total sales and net sales
+            $subtotal = $unitPrice * $unitsSold;
+            $discountAmount = ($discount / 100) * $subtotal;
+            $totalSales = $subtotal;
+            $netSales = $subtotal - $discountAmount;
+        
+            // Add data to report array
+            $reportData[] = [
+                'category' => $category,
+                'product_name' => $productName,
+                'units_sold' => $unitsSold,
+                'unit_price' => number_format($unitPrice, 2),
+                'discount' => number_format($discountAmount, 2),
+                'total_sales' => number_format($totalSales, 2),
+                'net_sales' => number_format($netSales, 2),
+            ];
+        }
+        
+        // Return JSON response
+        return response()->json([
+            'reportData' => $reportData,
+            'selectedDate' => $date,
+            'selectedMonth' => $month
+        ]);
     }
     
-    // Pass data to the view
-    return view('sales.report', [
-        'reportData' => $reportData,
-        'selectedDate' => $date,
-        'selectedMonth' => $month
-    ]);
-}
 
 }
 

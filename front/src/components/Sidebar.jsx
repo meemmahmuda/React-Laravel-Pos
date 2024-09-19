@@ -51,17 +51,17 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/sales-returns" className="nav-link text-white">
+              <Link to="/sales_returns" className="nav-link text-white">
                 <FontAwesomeIcon icon={faArrowCircleRight} /> Sales Return
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/sales-report" className="nav-link text-white">
+              <Link to="/sales/report" className="nav-link text-white">
                 <FontAwesomeIcon icon={faFlag} /> Sales Report
               </Link>
             </li>
             <li className="nav-item">
-              <Link to="/purchases-report" className="nav-link text-white">
+              <Link to="/purchases/report" className="nav-link text-white">
                 <FontAwesomeIcon icon={faFlag} /> Purchases Report
               </Link>
             </li>
