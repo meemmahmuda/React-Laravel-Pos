@@ -66,5 +66,9 @@ Route::get('purchases/invoice/{purchase}', [PurchaseController::class, 'printInv
 
 Route::get('/sales', [SaleController::class, 'index']);
 Route::post('/sales', [SaleController::class, 'store']);
+Route::get('/sales/{sale}', [SaleController::class, 'show']); 
+Route::put('/sales/{sale}', [SaleController::class, 'update']);
+Route::delete('/sales/{sale}', [SaleController::class, 'destroy']);
+Route::get('sales/invoice/{sale}', [SaleController::class, 'printInvoice']);
 
 

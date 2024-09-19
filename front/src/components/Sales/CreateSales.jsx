@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateSales = () => {
     const [products, setProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
     const [formData, setFormData] = useState({
         customer_name: '',
         address: '',
@@ -16,7 +15,7 @@ const CreateSales = () => {
         selling_price: 0,
         stock: 0,
         discount: 0,
-        quantity: 1,
+        quantity: 0,
         total_price: 0,
         money_taken: 0,
         money_returned: 0,
@@ -25,7 +24,6 @@ const CreateSales = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch the list of products from the backend
         axios.get('http://127.0.0.1:8000/api/products')
             .then(response => setProducts(response.data))
             .catch(error => console.error('Error fetching products:', error));
@@ -43,43 +41,70 @@ const CreateSales = () => {
                 category: selectedOption.category.name,
                 selling_price: selectedOption.selling_price,
                 stock: selectedOption.stock,
-                quantity: 1, // Reset the quantity when a new product is selected
+                quantity: 0,
                 discount: 0,
-                total_price: selectedOption.selling_price,
+                total_price: 0,
             });
-            setSelectedProduct(selectedOption);
         }
     };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
 
-        if (name === 'quantity' && selectedProduct) {
-            const quantity = Math.min(value, selectedProduct.stock);
+        if (name === 'customer_name' || name === 'address') {
             setFormData(prevState => ({
                 ...prevState,
-                quantity,
-                total_price: calculateTotalPrice(quantity, prevState.selling_price, prevState.discount),
+                [name]: value,
             }));
-        }
+        } else {
+            // Parse numeric values appropriately
+            const parsedValue = Math.max(0, parseFloat(value));
 
-        if (name === 'discount' || name === 'quantity') {
-            const updatedTotalPrice = calculateTotalPrice(formData.quantity, formData.selling_price, formData.discount);
             setFormData(prevState => ({
                 ...prevState,
-                total_price: updatedTotalPrice,
+                [name]: parsedValue,
             }));
-        }
 
-        if (name === 'money_taken') {
-            setFormData(prevState => ({
-                ...prevState,
-                money_returned: calculateMoneyReturned(prevState.total_price, value),
-            }));
+            if (name === 'quantity') {
+                const updatedQuantity = Math.min(parsedValue, formData.stock);
+
+                if (parsedValue > formData.stock) {
+                    alert(`Quantity cannot exceed stock. Available stock: ${formData.stock}`);
+                }
+
+                const newTotalPrice = calculateTotalPrice(
+                    updatedQuantity,
+                    formData.selling_price,
+                    formData.discount
+                );
+
+                setFormData(prevState => ({
+                    ...prevState,
+                    quantity: updatedQuantity,
+                    total_price: newTotalPrice,
+                }));
+            }
+
+            if (name === 'discount') {
+                const newTotalPrice = calculateTotalPrice(
+                    formData.quantity,
+                    formData.selling_price,
+                    parsedValue
+                );
+
+                setFormData(prevState => ({
+                    ...prevState,
+                    discount: parsedValue,
+                    total_price: newTotalPrice,
+                }));
+            }
+
+            if (name === 'money_taken') {
+                setFormData(prevState => ({
+                    ...prevState,
+                    money_returned: calculateMoneyReturned(prevState.total_price, parsedValue),
+                }));
+            }
         }
     };
 
@@ -95,11 +120,10 @@ const CreateSales = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Send the data to the server via POST
         axios.post('http://127.0.0.1:8000/api/sales', formData)
             .then(response => {
                 console.log('Sale created successfully:', response.data);
-                navigate('/sales'); // Redirect to sales list page after successful creation
+                navigate('/sales');
             })
             .catch(error => console.error('Error creating sale:', error));
     };
@@ -107,7 +131,7 @@ const CreateSales = () => {
     return (
         <div className="container">
             <h2>Create Sale</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{ marginBottom: '60px' }}>
                 <div className="form-group">
                     <label htmlFor="customer_name">Customer Name</label>
                     <input

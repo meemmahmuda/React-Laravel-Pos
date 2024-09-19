@@ -12,7 +12,7 @@ class SaleController extends Controller
     // Return all sales with product details
     public function index()
     {
-        $sales = Sale::with('product')->orderBy('created_at', 'desc')->get();
+        $sales = Sale::with('product.category')->orderBy('created_at', 'desc')->get();
         return response()->json($sales, 200);
     }
 
@@ -138,6 +138,17 @@ class SaleController extends Controller
 
         return response()->json(['message' => 'Sale deleted successfully!'], 200);
     }
+
+
+    // Show a specific sale with product details
+public function show(Sale $sale)
+{
+    // Load the product and its category for the specific sale
+    $sale->load('product.category');
+
+    return response()->json($sale, 200);
+}
+
 
 
     public function printInvoice($id)
