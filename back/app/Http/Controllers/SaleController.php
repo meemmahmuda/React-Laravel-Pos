@@ -1,142 +1,116 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Sale;
 use App\Models\Product;
-use PDF;
-
 use Illuminate\Http\Request;
+use PDF;
 
 class SaleController extends Controller
 {
+    // Return all sales with product details
     public function index()
     {
         $sales = Sale::with('product')->orderBy('created_at', 'desc')->get();
-        return view('sales.index', compact('sales'));
+        return response()->json($sales, 200);
     }
 
+    // Return available products for creating a sale
     public function create()
     {
         $products = Product::where('stock', '>', 0)->get();
-        return view('sales.create', compact('products'));
+        return response()->json($products, 200);
     }
 
+    // Store a new sale and update product stock
     public function store(Request $request)
     {
         $product = Product::find($request->product_id);
 
-        if ($product->stock <= 0) {
-            return redirect()->back()->withErrors(['product_id' => 'The selected product is out of stock.']);
+        if (!$product || $product->stock <= 0) {
+            return response()->json(['error' => 'The selected product is out of stock.'], 422);
         }
 
         if ($request->quantity > $product->stock) {
-            return redirect()->back()->withErrors(['quantity' => 'The quantity cannot be greater than the available stock.']);
+            return response()->json(['error' => 'The quantity cannot be greater than the available stock.'], 422);
         }
-    
+
+        // Calculate totals
         $sellingPrice = $product->selling_price;
         $quantity = $request->quantity;
-        $discountPercentage = $request->discount;
-    
-        // Calculate the subtotal
+        $discountPercentage = $request->discount ?? 0;
+
         $subtotal = $sellingPrice * $quantity;
-        
-        // Calculate the discount amount
         $discountAmount = ($discountPercentage / 100) * $subtotal;
-        
-        // Calculate the total price after discount
         $totalPrice = $subtotal - $discountAmount;
-        if ($totalPrice < 0) {
-            $totalPrice = 0;
-        }
-    
-        // Calculate money returned
+        $totalPrice = max($totalPrice, 0);
+
         $moneyTaken = $request->money_taken;
-        $moneyReturned = $moneyTaken - $totalPrice;
-        if ($moneyReturned < 0) {
-            $moneyReturned = 0;
-        }
+        $moneyReturned = max($moneyTaken - $totalPrice, 0);
 
-    // Create the sale record
-    Sale::create([
-        'customer_name' => $request->customer_name,
-        'address' => $request->address,
-        'phone_no' => $request->phone_no,
-        'product_id' => $request->product_id,
-        'quantity' => $quantity,
-        'selling_price' => $sellingPrice, 
-        'total_price' => $totalPrice,
-        'discount' => $discountPercentage,
-        'money_taken' => $moneyTaken,
-        'money_returned' => $moneyReturned,
-    ]);
-
-    // Update the product stock
-    $product->decrement('stock', $quantity);
-
-    return redirect()->route('sales.index')->with('success', 'Sale created successfully!');
-
-
-        // Update product stock
-        $product->update([
-            'stock' => $product->stock - $request->quantity,
+        // Create the sale record
+        $sale = Sale::create([
+            'customer_name' => $request->customer_name,
+            'address' => $request->address,
+            'phone_no' => $request->phone_no,
+            'product_id' => $request->product_id,
+            'quantity' => $quantity,
+            'selling_price' => $sellingPrice,
+            'total_price' => $totalPrice,
+            'discount' => $discountPercentage,
+            'money_taken' => $moneyTaken,
+            'money_returned' => $moneyReturned,
         ]);
 
+        // Update product stock
+        $product->decrement('stock', $quantity);
 
-        
-
-        // Generate an invoice (implement your own logic)
-        // $this->generateInvoice($sale);
-
-        return redirect()->route('sales.index')->with('success', 'Sale completed and invoice generated.');
+        return response()->json(['message' => 'Sale created successfully!', 'sale' => $sale], 201);
     }
 
+    // Edit a sale by fetching the sale data and available products
     public function edit(Sale $sale)
     {
         $products = Product::where('stock', '>', 0)->get();
-        return view('sales.edit', compact('sale', 'products'));
+        return response()->json(['sale' => $sale, 'products' => $products], 200);
     }
 
+    // Update a sale and adjust product stock
     public function update(Request $request, Sale $sale)
     {
         $product = Product::find($request->product_id);
-    
-        // Adjust stock only if the quantity has changed
+
+        if (!$product) {
+            return response()->json(['error' => 'The selected product does not exist.'], 404);
+        }
+
         $oldQuantity = $sale->quantity;
         $newQuantity = $request->quantity;
-    
+
+        // Adjust stock if the quantity has changed
         if ($newQuantity != $oldQuantity) {
-            // Revert the previous quantity from the stock
-            $product->increment('stock', $oldQuantity);
-    
-            // Deduct the new quantity from the stock
+            $product->increment('stock', $oldQuantity);  // Revert old quantity
+
             if ($newQuantity > $product->stock) {
-                return redirect()->back()->withErrors(['quantity' => 'The quantity cannot be greater than the available stock.']);
+                return response()->json(['error' => 'The quantity cannot be greater than the available stock.'], 422);
             }
-            $product->decrement('stock', $newQuantity);
+
+            $product->decrement('stock', $newQuantity);  // Deduct new quantity
         }
-    
+
+        // Recalculate totals
         $sellingPrice = $product->selling_price;
-        $discountPercentage = $request->discount;
-    
-        // Calculate the subtotal
+        $discountPercentage = $request->discount ?? 0;
+
         $subtotal = $sellingPrice * $newQuantity;
-    
-        // Calculate the discount amount
         $discountAmount = ($discountPercentage / 100) * $subtotal;
-    
-        // Calculate the total price after discount
         $totalPrice = $subtotal - $discountAmount;
-        if ($totalPrice < 0) {
-            $totalPrice = 0;
-        }
-    
-        // Calculate money returned
+        $totalPrice = max($totalPrice, 0);
+
         $moneyTaken = $request->money_taken;
-        $moneyReturned = $moneyTaken - $totalPrice;
-        if ($moneyReturned < 0) {
-            $moneyReturned = 0;
-        }
-    
+        $moneyReturned = max($moneyTaken - $totalPrice, 0);
+
         // Update the sale record
         $sale->update([
             'customer_name' => $request->customer_name,
@@ -150,17 +124,21 @@ class SaleController extends Controller
             'money_taken' => $moneyTaken,
             'money_returned' => $moneyReturned,
         ]);
-    
-        return redirect()->route('sales.index')->with('success', 'Sale updated successfully.');
-    }
-    
-    
 
+        return response()->json(['message' => 'Sale updated successfully!', 'sale' => $sale], 200);
+    }
+
+    // Delete a sale and adjust stock
     public function destroy(Sale $sale)
     {
+        $product = $sale->product;
+        $product->increment('stock', $sale->quantity);  // Revert stock
+
         $sale->delete();
-        return redirect()->route('sales.index')->with('success', 'Sale deleted successfully.');
+
+        return response()->json(['message' => 'Sale deleted successfully!'], 200);
     }
+
 
     public function printInvoice($id)
     {

@@ -10,6 +10,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SaleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,5 +62,9 @@ Route::post('/purchases', [PurchaseController::class, 'store']);
 Route::get('/purchases/{purchase}', [PurchaseController::class, 'show']); 
 Route::put('/purchases/{purchase}', [PurchaseController::class, 'update']);
 Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy']);
-// In your routes/api.php
 Route::get('purchases/invoice/{purchase}', [PurchaseController::class, 'printInvoice']);
+
+Route::get('/sales', [SaleController::class, 'index']);
+Route::post('/sales', [SaleController::class, 'store']);
+
+

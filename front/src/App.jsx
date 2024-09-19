@@ -24,6 +24,8 @@ import PurchasesList from './components/Purchases/PurchaseList';
 import CreatePurchase from './components/Purchases/CreatePurchase';
 import EditPurchase from './components/Purchases/EditPurchase';
 import PurchaseInvoice from './components/Purchases/PurchaseInvoice';
+import SalesList from './components/Sales/SalesList';
+import CreateSales from './components/Sales/CreateSales';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -94,6 +96,9 @@ const App = () => {
         <Route path="/purchases/create" element={<Layout><CreatePurchase /></Layout>} />
         <Route path="/purchases/edit/:id" element={<Layout><EditPurchase /></Layout>} />
         <Route path="/purchases/invoice/:id" element={<PurchaseInvoice />} />
+        <Route path="/sales" element={<Layout><SalesList /></Layout>} />
+        <Route path="/sales/create" element={<Layout><CreateSales /></Layout>} />
+
 
       </Routes>
     </Router>
