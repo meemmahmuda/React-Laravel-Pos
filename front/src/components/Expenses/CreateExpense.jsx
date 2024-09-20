@@ -40,7 +40,7 @@ const CreateExpense = () => {
   return (
     <div className="container">
       <h2>Add New Expense</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: '60px' }}>
         <div className="form-group">
           <label htmlFor="salaries_wages">Salaries and Wages</label>
           <input

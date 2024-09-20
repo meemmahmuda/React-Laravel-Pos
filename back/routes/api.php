@@ -67,7 +67,7 @@ Route::put('/purchases/{purchase}', [PurchaseController::class, 'update']);
 Route::delete('/purchases/{purchase}', [PurchaseController::class, 'destroy']);
 Route::get('purchases/invoice/{purchase}', [PurchaseController::class, 'printInvoice']);
 
-Route::get('/income_statement', [IncomeStatementController::class, 'index']);
+Route::get('/income-statement', [IncomeStatementController::class, 'index']);
 Route::get('/sales/report', [SaleController::class, 'report']);
 Route::get('/sales', [SaleController::class, 'index']);
 Route::post('/sales', [SaleController::class, 'store']);

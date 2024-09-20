@@ -1,42 +1,38 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const IncomeStatement = () => {
-    const [incomeStatement, setIncomeStatement] = useState(null); // Initially set to null
-    const [selectedMonth, setSelectedMonth] = useState("");
+    const [incomeStatement, setIncomeStatement] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7)); // Default to current month
 
     useEffect(() => {
-        // Fetch income statement data when component mounts
-        const fetchIncomeStatement = async () => {
-            try {
-                const response = await axios.get("http://127.0.0.1:8000/api/income_statement", {
-                    params: { month: selectedMonth },
-                });
-                setIncomeStatement(response.data.incomeStatement);
-            } catch (error) {
-                console.error("Error fetching income statement:", error);
-            }
-        };
-
-        fetchIncomeStatement();
+        fetchIncomeStatement(selectedMonth);
     }, [selectedMonth]);
 
-    const handleMonthChange = (event) => {
-        setSelectedMonth(event.target.value);
+    const fetchIncomeStatement = async (month) => {
+        try {
+            const response = await axios.get(`http://127.0.0.1:8000/api/income-statement?month=${month}`);
+            setIncomeStatement(response.data);
+        } catch (error) {
+            console.error('Error fetching income statement:', error);
+        }
     };
 
-    // Safeguard for accessing incomeStatement fields
-    const formatAmount = (amount) =>
-        typeof amount === "number" ? amount.toFixed(2) : "0.00";
+    const handleMonthChange = (e) => {
+        setSelectedMonth(e.target.value);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        fetchIncomeStatement(selectedMonth);
+    };
 
     return (
         <div className="container">
             {/* Month selection form */}
-            <form method="GET" className="mb-4">
+            <form onSubmit={handleSubmit} className="mb-4">
                 <div className="form-group row">
-                    <label htmlFor="month" className="col-sm-2 col-form-label">
-                        Select Month:
-                    </label>
+                    <label htmlFor="month" className="col-sm-2 col-form-label">Select Month:</label>
                     <div className="col-sm-4">
                         <input
                             type="month"
@@ -48,14 +44,12 @@ const IncomeStatement = () => {
                         />
                     </div>
                     <div className="col-sm-2">
-                        <button type="submit" className="btn btn-primary">
-                            Filter
-                        </button>
+                        <button type="submit" className="btn btn-primary">Filter</button>
                     </div>
                 </div>
             </form>
 
-            {/* Only render the table if incomeStatement is available */}
+            {/* Display the income statement in vertical format */}
             {incomeStatement ? (
                 <table className="table table-bordered">
                     <thead className="thead-dark">
@@ -67,64 +61,64 @@ const IncomeStatement = () => {
                     <tbody>
                         <tr>
                             <td>Gross Sales</td>
-                            <td>TK {formatAmount(incomeStatement.gross_sales)}</td>
+                            <td>TK {incomeStatement.gross_sales.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(-) Discounts</td>
-                            <td>TK {formatAmount(incomeStatement.discount_amount)}</td>
+                            <td>TK {incomeStatement.discount_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(-) Sales Returns</td>
-                            <td>TK {formatAmount(incomeStatement.sales_return_amount)}</td>
+                            <td>TK {incomeStatement.sales_return_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
-                        <tr style={{ fontWeight: "bold" }}>
+                        <tr style={{ fontWeight: 'bold' }}>
                             <td>Net Sales</td>
-                            <td>TK {formatAmount(incomeStatement.net_sales)}</td>
+                            <td>TK {incomeStatement.net_sales.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(-) Purchases</td>
-                            <td>TK {formatAmount(incomeStatement.purchase_amount)}</td>
+                            <td>TK {incomeStatement.purchase_amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>Cost of Goods Sold (COGS)</td>
-                            <td>TK {formatAmount(incomeStatement.cogs)}</td>
+                            <td>TK {incomeStatement.cogs.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
-                        <tr style={{ fontWeight: "bold" }}>
+                        <tr style={{ fontWeight: 'bold' }}>
                             <td>Gross Profit</td>
-                            <td>TK {formatAmount(incomeStatement.gross_profit)}</td>
+                            <td>TK {incomeStatement.gross_profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(-) Operating Expenses</td>
-                            <td>TK {formatAmount(incomeStatement.operating_expenses)}</td>
+                            <td>TK {incomeStatement.operating_expenses.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
-                        <tr style={{ fontWeight: "bold" }}>
+                        <tr style={{ fontWeight: 'bold' }}>
                             <td>Operating Profit (EBIT)</td>
-                            <td>TK {formatAmount(incomeStatement.operating_profit)}</td>
+                            <td>TK {incomeStatement.operating_profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(+) Interest Income</td>
-                            <td>TK {formatAmount(incomeStatement.interest_income)}</td>
+                            <td>TK {incomeStatement.interest_income.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(-) Interest Expense</td>
-                            <td>TK {formatAmount(incomeStatement.interest_expense)}</td>
+                            <td>TK {incomeStatement.interest_expense.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
-                        <tr style={{ fontWeight: "bold" }}>
+                        <tr style={{ fontWeight: 'bold' }}>
                             <td>Net Income Before Taxes (EBT)</td>
-                            <td>TK {formatAmount(incomeStatement.net_income_before_taxes)}</td>
+                            <td>TK {incomeStatement.net_income_before_taxes.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                         <tr>
                             <td>(-) Taxes (15%)</td>
-                            <td>TK {formatAmount(incomeStatement.taxes)}</td>
+                            <td>TK {incomeStatement.taxes.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
-                        <tr style={{ fontWeight: "bold" }}>
+                        <tr style={{ fontWeight: 'bold' }}>
                             <td>Net Income/Loss</td>
-                            <td>TK {formatAmount(incomeStatement.net_income)}</td>
+                            <td>TK {incomeStatement.net_income.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                         </tr>
                     </tbody>
                 </table>
             ) : (
-                <p>Loading income statement data...</p>
+                <p>Loading...</p>
             )}
         </div>
     );

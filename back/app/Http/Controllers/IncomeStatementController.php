@@ -16,28 +16,22 @@ class IncomeStatementController extends Controller
         // Get the selected month from the request, default to the current month
         $selectedMonth = $request->input('month', date('Y-m'));
     
-        // Aggregate sales for the entire month (Gross Sales, Discounts)
+        // Aggregate data similarly to what you had before
         $sales = Sale::selectRaw('SUM(total_price) as total_sales, SUM(discount) as total_discounts')
             ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$selectedMonth])
             ->first();
     
-        // Aggregate purchases for the entire month
         $purchases = Purchase::selectRaw('SUM(total_price) as total_purchases')
             ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$selectedMonth])
             ->first();
     
-        // Aggregate sales returns for the entire month
         $salesReturns = SalesReturn::selectRaw('SUM(total_price) as total_returns')
             ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$selectedMonth])
             ->first();
     
-        // Calculate beginning stock (stock at the start of the month)
-        $beginningStock = Product::sum('stock');  // Assuming stock is tracked and available
+        $beginningStock = Product::sum('stock');
+        $endingStock = Product::sum('stock');
     
-        // Calculate ending stock (stock at the end of the month)
-        $endingStock = Product::sum('stock'); // Placeholder, adjust logic to reflect actual end-of-month stock
-    
-        // Calculate total operating expenses for the entire month
         $expenses = Expense::selectRaw('SUM(total_expense) as total_expenses')
             ->whereRaw('DATE_FORMAT(created_at, "%Y-%m") = ?', [$selectedMonth])
             ->first();
@@ -49,33 +43,19 @@ class IncomeStatementController extends Controller
         $totalSalesReturns = $salesReturns->total_returns ?? 0;
         $totalExpenses = $expenses->total_expenses ?? 0;
     
-        // Define Interest Income and Interest Expense
-        $interestIncome = 1000; // Example value
-        $interestExpense = 500; // Example value
+        $interestIncome = 1000;
+        $interestExpense = 500;
     
-        // Calculate Net Sales: Gross Sales - Discounts - Sales Returns
         $netSales = $totalSales - $totalDiscounts - $totalSalesReturns;
-    
-        // Calculate COGS: Beginning Stock + Purchases - Ending Stock
         $COGS = $beginningStock + $totalPurchases - $endingStock;
-    
-        // Calculate Gross Profit: Net Sales - COGS
         $grossProfit = $netSales - $COGS;
-    
-        // Calculate Operating Profit: Gross Profit - Operating Expenses
         $operatingProfit = $grossProfit - $totalExpenses;
-    
-        // Calculate Net Income Before Taxes: Operating Profit + Interest Income - Interest Expense
         $netIncomeBeforeTaxes = $operatingProfit + $interestIncome - $interestExpense;
-    
-        // Calculate Taxes: 15% of Net Income Before Taxes
         $taxes = 0.15 * $netIncomeBeforeTaxes;
-    
-        // Calculate Net Income: Net Income Before Taxes - Taxes
         $netIncome = $netIncomeBeforeTaxes - $taxes;
     
-        // Prepare the income statement data for JSON response
-        $incomeStatement = [
+        // Prepare the data in JSON format
+        return response()->json([
             'gross_sales' => $totalSales,
             'discount_amount' => $totalDiscounts,
             'sales_return_amount' => $totalSalesReturns,
@@ -90,12 +70,7 @@ class IncomeStatementController extends Controller
             'net_income_before_taxes' => $netIncomeBeforeTaxes,
             'taxes' => $taxes,
             'net_income' => $netIncome,
-        ];
-    
-        // Return JSON response
-        return response()->json([
-            'incomeStatement' => $incomeStatement,
-            'selectedMonth' => $selectedMonth,
+            'selected_month' => $selectedMonth
         ]);
     }
     
